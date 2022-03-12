@@ -1,76 +1,62 @@
 const input = require("prompt");
 const colors = require("@colors/colors/safe");
-input.message = colors.rainbow("CryptoTest:");
+
+input.message = colors.rainbow("CyptoTest:");
 input.delimiter = colors.green("->");
 
-const alfabet = [
-  "a",
-  "b",
-  "c",
-  "d",
-  "e",
-  "f",
-  "g",
-  "h",
-  "i",
-  "j",
-  "k",
-  "l",
-  "m",
-  "n",
-  "o",
-  "p",
-  "q",
-  "r",
-  "s",
-  "t",
-  "u",
-  "v",
-  "w",
-  "x",
-  "y",
-  "z",
-];
+const alphabet = [..."abcdefghijklmnopqrstuvwxyz"];
 
-const convert = (isi, sandi) => {
-  let pecahPesan = [...isi];
+const convert = (isi, sandi, action) => {
   let urutanList = [];
+  let pecahPesan = [...isi];
   let urutanKeHuruf = [];
+  let lengthAlpha = alphabet.length;
+
+  if (sandi > 26) {
+    sandi = (sandi - lengthAlpha) % lengthAlpha;
+  }
 
   pecahPesan.map((pesan) => {
-    let urutan = alfabet.indexOf(pesan) + 1;
-    const totalUrutan = urutan + parseInt(sandi);
-    if (totalUrutan > alfabet.length) {
-      return urutanList.push(totalUrutan - alfabet.length);
+    let indexAlpha;
+    let indexPilihan;
+
+    if (action === "dec") {
+      // dec for decrypt
+      indexAlpha = alphabet.indexOf(pesan) - parseInt(sandi) + 1;
     } else {
-      return urutanList.push(totalUrutan);
+      // enc for encrypt
+      indexAlpha = parseInt(sandi) + alphabet.indexOf(pesan) + 1;
     }
+
+    if (indexAlpha > 26) {
+      indexPilihan = indexAlpha - lengthAlpha;
+    } else {
+      indexPilihan = indexAlpha;
+    }
+
+    urutanList.push(indexPilihan);
   });
 
-  urutanList.map((list) => {
-    return urutanKeHuruf.push(alfabet[parseInt(list) - 1]);
+  urutanList.map((urutan) => {
+    urutanKeHuruf.push(alphabet[urutan - 1]);
   });
-  const encrypt = urutanKeHuruf.join("");
-  return encrypt;
+
+  return urutanKeHuruf.join("");
 };
 
 const main = () => {
-  console.log("running input ...");
   input.start();
   input.get(["pengirim", "tujuan", "isi", "sandi"], (err, result) => {
-    if (err) return err;
-    const data = {
-      pengirim: result.pengirim,
-      tujuan: result.tujuan,
-      isi: result.isi,
-      sandi: result.sandi,
-    };
-    const { pengirim, tujuan, isi, sandi } = data;
-    const encryptedText = convert(data.isi, data.sandi);
+    const { pengirim, tujuan, isi, sandi } = result;
+
+    const encryptText = convert(isi, sandi, "enc");
+    const dencryptText = convert(encryptText, sandi, "dec");
+
     console.log(
       `pesan dikirim dari ${pengirim} kepada ${tujuan}, pesan originalnya adalah '${isi}' telah di encrypt menggunakan sandi ${sandi}:\n`
     );
-    console.log("encrypted message with chipper method: \n", encryptedText);
+    console.log("encrypted message with chipper method: ", encryptText);
+    console.log("dencrypt message with dencrypter method: ", dencryptText);
   });
 };
 
