@@ -1,2 +1,4 @@
 # chipperTextTesting
-test aja buat PR
+
+DEV for development build
+MAIN for production release
